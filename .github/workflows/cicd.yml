@@ -1,0 +1,32 @@
+name: DevOps CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Build Docker Image
+        run: |
+          docker build -t devops-lab-app ./app
+
+      - name: Install kubectl
+        uses: azure/setup-kubectl@v4
+        with:
+          version: 'latest'
+
+      - name: Validate Kubernetes Deployment
+        run: |
+          kubectl apply --dry-run=client -f k8s/deployment.yml
+
+      - name: Validate Kubernetes Service
+        run: |
+          kubectl apply --dry-run=client -f k8s/service.yml
+
